@@ -2,7 +2,10 @@
   "name": "@km-monorepo/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start:front": "nx serve frontend",
+    "start:back": "nx serve backend"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^10.0.2",
