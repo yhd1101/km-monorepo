@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Get, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { Provider } from './entities/provider.enum';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>
+  ) {}
+
+  async userGetAll() {
+    const users = await this.userRepository.find();
+    return { count: users.length, users };
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async createUser(createUserDto: CreateUserDto) {
+    const newSignup = await this.userRepository.create(createUserDto);
+    await this.userRepository.save(newSignup);
+    return newSignup;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  //user 찾기(byid)
+  async getUserById(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('No user Id');
+    }
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  //email로찾기
+  async getUserByEmail(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException('No user Email');
+    }
+    return user;
   }
 }
